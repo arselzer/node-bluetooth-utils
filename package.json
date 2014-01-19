@@ -1,5 +1,15 @@
 {
   "name" : "bluetooth-sniff",
+  "version" : "0.0.1",
+  "description" : "A Bluetooth logger",
+  "author" : "Alexander Selzer <aselzer3@gmail.com>",
+  
+  "main" : "index.js",
+  
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/AlexanderSelzer/bluetooth-sniffer.git"
+  }
   
   "dependencies" : {
     "colors" : "0.6.x",
