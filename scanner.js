@@ -11,13 +11,13 @@ function BluetoothScanner(device, cb) {
 BluetoothScanner.prototype.getHciconfig = function(cb) {
   exec(this.hciconfig, function(err, stdout, stderr) {
     if (!err) {
-      
+      var hcidev = this.hcidev;
       var lines = stdout.split("\n");
-      var hciInfo = {}
-      
+      var hciInfo = {};
+
       lines.forEach(function(line) {
         // Filter out the "hci0" at the beginning.
-        if ((new RegExp("^" + this.hcidev + ":")).test(line)) {
+        if ((new RegExp("^" + "hci")).test(line)) {
           line = line.slice(line.indexOf(":") + 1, line.length);
         }
 

@@ -1,4 +1,4 @@
 
 --help, -h      -- this
---interface, -i -- The Bluetooth interface (mostly hcix)
---info          -- Shows the usual hciconfig -a output (just in JSON).
+--interface, -i -- The Bluetooth Network interface (default: hci0)
+--info          -- Shows the Bluetooth device configuration (in JSON).
