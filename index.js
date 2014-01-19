@@ -1,40 +1,20 @@
-var exec = require("child_process").exec,
-    colors = require("colors");
+var argv = require("optimist").argv,
+    fs = require("fs"),
+    BluetoothScanner = require("./scanner.js");
 
-function BluetoothScanner(device, cb) {  
-  this.hciconfig = "hciconfig" + " -a " + device;
-  
-  this.getHciconfigData("hci0", function() {});
-  this.isUp(device, function() {});
-  cb();
+function help() {
+  fs.createReadStream("help.txt")
+  .on("end", function() {
+    process.exit();
+  })
+  .pipe(process.stdout);
 }
 
-BluetoothScanner.prototype.getHciconfigData = function(dev, cb) {
-  exec(this.hciconfig, function(err, stdout, stderr) {
-    if (!err) {
-      process.stdout.write("hciconfig:\n" + stdout);
-      
-      var lines = stdout.split("\n");
-      var hciInfo = {}
-      
-      lines.forEach(function(line) {
-        var sepparatorIndex = line.indexOf(":");
-        var objIndex = line.slice(0, sepparatorIndex).replace(/\t/, ""); // Ugh, tabs.
-        var objValue = line.slice(sepparatorIndex + 1, line.length).replace(/\t/, "");
-        hciInfo[objIndex] = objValue;
-      });
-      console.dir(hciInfo);
-    }
-    else {
-      console.error("[Error]".red, err.message);
-    }
-  });
+if (argv.help || argv.h) {
+  help();
 }
 
-BluetoothScanner.prototype.isUp = function(dev, cb) {
-
-}
-
-var scanner = new BluetoothScanner("hci0", function() {
-  
+var scanner = new BluetoothScanner(argv.interface || argv.i || "hci0", function() {
+   
 });
+

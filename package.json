@@ -2,6 +2,7 @@
   "name" : "bluetooth-sniff",
   
   "dependencies" : {
-    "colors" : "0.6.x"
+    "colors" : "0.6.x",
+    "optimist" : "0.6.x"
   }
 }

@@ -1,0 +1,4 @@
+
+--help, -h -- this
+--interface, -i -- The Bluetooth interface (mostly hcix)
+
