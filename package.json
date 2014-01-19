@@ -2,6 +2,6 @@
   "name" : "bluetooth-sniff",
   
   "dependencies" : {
-    "ble-scanner" : "*"
+    "colors" : "0.6.x"
   }
 }
