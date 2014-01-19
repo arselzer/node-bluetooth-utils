@@ -10,11 +10,15 @@ function help() {
   .pipe(process.stdout);
 }
 
+var hcidev = argv.interface || argv.i || "hci0";
+
 if (argv.help || argv.h) {
   help();
 }
 
-var scanner = new BluetoothScanner(argv.interface || argv.i || "hci0", function() {
-   
-});
-
+if (argv.info) {
+  var scanner = new BluetoothScanner(hcidev);
+  scanner.getHciconfig(function(config) {
+    console.log(JSON.stringify(config, null, 2));
+  });
+}

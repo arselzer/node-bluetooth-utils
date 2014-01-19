@@ -2,37 +2,45 @@ var exec = require("child_process").exec,
     colors = require("colors");
 
 function BluetoothScanner(device, cb) {  
+  this.hcidev = device;
   this.hciconfig = "hciconfig" + " -a " + device;
-  
-  this.getHciconfigData("hci0", function() {});
-  this.isUp(device, function() {});
-  cb();
+  if (cb && typeof(cb) === "function")
+    cb(); 
 }
 
-BluetoothScanner.prototype.getHciconfigData = function(dev, cb) {
+BluetoothScanner.prototype.getHciconfig = function(cb) {
   exec(this.hciconfig, function(err, stdout, stderr) {
     if (!err) {
-      process.stdout.write("hciconfig:\n" + stdout);
       
       var lines = stdout.split("\n");
       var hciInfo = {}
       
       lines.forEach(function(line) {
-        var sepparatorIndex = line.indexOf(":");
-        var objIndex = line.slice(0, sepparatorIndex).replace(/\t/, ""); // Ugh, tabs.
-        var objValue = line.slice(sepparatorIndex + 1, line.length).replace(/\t/, "");
-        hciInfo[objIndex] = objValue;
+        // Filter out the "hci0" at the beginning.
+        if ((new RegExp("^" + this.hcidev + ":")).test(line)) {
+          line = line.slice(line.indexOf(":") + 1, line.length);
+        }
+
+        var separatorIndex = line.indexOf(":");
+        var objIndex = line.slice(0, separatorIndex).replace(/\t/, ""); // Ugh, tabs.
+        var objValue = line.slice(separatorIndex + 1, line.length).replace(/\t/, "");
+        
+        // A stream would be more elegant. TODO
+        if (objIndex !== "")
+          hciInfo[objIndex] = objValue;
       });
-      console.dir(hciInfo);
+      cb(hciInfo);
     }
     else {
-      console.error("[Error]".red, err.message);
+      console.log("[Error]".red, err.message);
     }
   });
 }
 
-BluetoothScanner.prototype.isUp = function(dev, cb) {
-
+BluetoothScanner.prototype.isUp = function(cb) {
+  this.getHciconfig(function(data) {
+    cb(!!data["UP RUNNING"]);
+  });
 }
 
 module.exports = BluetoothScanner;
