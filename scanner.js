@@ -22,8 +22,12 @@ BluetoothScanner.prototype.getHciconfig = function(cb) {
         }
 
         var separatorIndex = line.indexOf(":");
-        var objIndex = line.slice(0, separatorIndex).replace(/\t/, ""); // Ugh, tabs.
-        var objValue = line.slice(separatorIndex + 1, line.length).replace(/\t/, "");
+        var objIndex =  line.slice(0, separatorIndex)
+                        .replace(/\t/, ""); // Ugh, tabs.
+        var objValue =  line
+                        .slice(separatorIndex + 1, line.length)
+                        .replace(/\t/, "")
+                        .replace(/^\s/, ""); // No spaces at the beginning.
         
         // A stream would be more elegant. TODO
         if (objIndex !== "")
