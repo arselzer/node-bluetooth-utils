@@ -44,10 +44,10 @@ BluetoothScanner.prototype.getHciconfig = function(cb) {
         }
         // Show State more conveniently
         else if (/UP/.test(objIndex)) {
-          hciInfo["Status"] = "UP";
+          hciInfo["State"] = "UP";
         }
         else if (/DOWN/.test(objIndex)) {
-          hciInfo["Status"] = "DOWN";
+          hciInfo["State"] = "DOWN";
         }
         // Default, if not empty (hciconfig prints empty lines).
         else if (objIndex !== "") {
