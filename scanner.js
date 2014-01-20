@@ -27,7 +27,8 @@ BluetoothScanner.prototype.getHciconfig = function(cb) {
         var objValue =  line
                         .slice(separatorIndex + 1, line.length)
                         .replace(/\t/, "")
-                        .replace(/^\s/, ""); // No spaces at the beginning.
+                        .replace(/^\s/, "") // No spaces at the beginning.
+                        .replace(/\s$/, ""); // And at the end.
 
         // Split up the Type line into "Type" and "Bus".        
         if (objIndex === "Type") {
@@ -49,7 +50,18 @@ BluetoothScanner.prototype.getHciconfig = function(cb) {
         else if (/DOWN/.test(objIndex)) {
           hciInfo["State"] = "DOWN";
         }
-        // Default, if not empty (hciconfig prints empty lines).
+        else if (/(RX bytes)|(TX bytes)/.test(objIndex)) {
+          var rxInfo = {};
+          var split = objValue.split(" ");
+          rxInfo["bytes"] = split[0];
+          split.forEach(function(item) {
+            var rxSplit = item.split(":");
+            rxInfo[rxSplit[0]] = rxSplit[1];  
+          });
+          var indexName = /RX|TX/.exec(objIndex)[0];
+          hciInfo[indexName] = rxInfo;
+        }
+        // If empty, drop (hciconfig prints empty lines).
         else if (objIndex !== "") {
           hciInfo[objIndex] = objValue;
         }
