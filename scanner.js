@@ -35,9 +35,14 @@ BluetoothScanner.prototype.getHciconfig = function(cb) {
           hciInfo[objIndex] = split[0];
           hciInfo[split[2].slice(0, split[2].length - 1)] = split[3]
         }
-        else if (objIndex === "BD ADDRESS") {
-          
+        // Split Bluetooth Address
+        else if (objIndex === "BD Address") {
+          var split = objValue.split(" ");
+          hciInfo[objIndex] = split[0];
+          hciInfo[split[2] + " " + split[3]] = split[4];
+          hciInfo[split[6] + " " + split[7]] = split[8];
         }
+        // Show State more conveniently
         else if (/UP/.test(objIndex)) {
           hciInfo["Status"] = "UP";
         }
