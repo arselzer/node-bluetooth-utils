@@ -13,10 +13,19 @@ Also, this could be a easy-to-use commandline utility.
 
 You could use this in a nice Bluetooth scanning web interface.
 
+Usage (for testing)
+========
+
+```
+--help, -h      -- this
+--interface, -i -- The Bluetooth Network interface (default: hci0)
+--info          -- Shows the Bluetooth device configuration (in JSON).
+```
+
 Status
 ========
 
-Need to improve hciconfig -> JS Obj parser.
+~~Finish/improve hciconfig -> JS Obj parser.~~
 
 Implement the scanning.
 
