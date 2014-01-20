@@ -50,6 +50,7 @@ BluetoothScanner.prototype.getHciconfig = function(cb) {
         else if (/DOWN/.test(objIndex)) {
           hciInfo["State"] = "DOWN";
         }
+        // Turn RX/TX info into subobjects.
         else if (/(RX bytes)|(TX bytes)/.test(objIndex)) {
           var rxInfo = {};
           var split = objValue.split(" ");
@@ -60,6 +61,19 @@ BluetoothScanner.prototype.getHciconfig = function(cb) {
           });
           var indexName = /RX|TX/.exec(objIndex)[0];
           hciInfo[indexName] = rxInfo;
+        }
+        // Turn array-like properties into arrays.
+        else if (/(Features)|(Packet type)|(Link policy)/.test(objIndex)) {
+          var objArray = objValue.split(" ");
+          hciInfo[objIndex] = objArray;
+        }
+        
+        else if (/(HCI Version)|(LMP Version)/.test(objIndex)) {
+          var info = {};
+          var split = objValue.split(" ");
+          info[objIndex.split(" ")[1]] = split[0] + " " + split[1];
+          info[split[3]] = split[4];
+          hciInfo[objIndex.split(" ")[0]] = info;
         }
         // If empty, drop (hciconfig prints empty lines).
         else if (objIndex !== "") {
