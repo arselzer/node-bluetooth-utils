@@ -17,7 +17,7 @@ BluetoothScanner.prototype.getHciconfig = function(cb) {
 
       lines.forEach(function(line) {
         // Filter out the "hci0" at the beginning.
-        if ((new RegExp("^" + "hci")).test(line)) {
+        if (/^hci/.test(line)) {
           line = line.slice(line.indexOf(":") + 1, line.length);
         }
 
@@ -28,10 +28,26 @@ BluetoothScanner.prototype.getHciconfig = function(cb) {
                         .slice(separatorIndex + 1, line.length)
                         .replace(/\t/, "")
                         .replace(/^\s/, ""); // No spaces at the beginning.
-        
-        // A stream would be more elegant. TODO
-        if (objIndex !== "")
+
+        // Split up the Type line into "Type" and "Bus".        
+        if (objIndex === "Type") {
+          var split = objValue.split(" ");
+          hciInfo[objIndex] = split[0];
+          hciInfo[split[2].slice(0, split[2].length - 1)] = split[3]
+        }
+        else if (objIndex === "BD ADDRESS") {
+          
+        }
+        else if (/UP/.test(objIndex)) {
+          hciInfo["Status"] = "UP";
+        }
+        else if (/DOWN/.test(objIndex)) {
+          hciInfo["Status"] = "DOWN";
+        }
+        // Default, if not empty (hciconfig prints empty lines).
+        else if (objIndex !== "") {
           hciInfo[objIndex] = objValue;
+        }
       });
       cb(hciInfo);
     }
