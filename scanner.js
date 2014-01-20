@@ -27,9 +27,8 @@ BluetoothScanner.prototype.getHciconfig = function(cb) {
         var objValue =  line
                         .slice(separatorIndex + 1, line.length)
                         .replace(/\t/, "")
-                        .replace(/^\s/, "") // No spaces at the beginning.
-                        .replace(/\s$/, ""); // And at the end.
-
+                        .trim(); // Remove whitespace at both ends.
+    
         // Split up the Type line into "Type" and "Bus".        
         if (objIndex === "Type") {
           var split = objValue.split(" ");
