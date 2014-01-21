@@ -1,6 +1,6 @@
 var argv = require("optimist").argv,
     fs = require("fs"),
-    BluetoothScanner = require("./scanner.js");
+    BluetoothScanner = require("./bluetooth.js");
 
 function help() {
   fs.createReadStream("help.txt")
