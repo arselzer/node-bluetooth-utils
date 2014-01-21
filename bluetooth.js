@@ -89,8 +89,18 @@ BluetoothScanner.prototype.getHciconfig = function(cb) {
 
 BluetoothScanner.prototype.isUp = function(cb) {
   this.getHciconfig(function(data) {
-    cb(!!data["UP RUNNING"]);
+    cb(data["State"] === "UP");
   });
+}
+
+// hcitool scan
+BluetoothScanner.prototype.scan = function(cb) {
+
+}
+
+// hcidump
+BluetoothScanner.prototype.sniff = function(cb) {
+
 }
 
 module.exports = BluetoothScanner;
