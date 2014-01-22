@@ -20,10 +20,20 @@ BluetoothScanner.prototype.getDevices = function(cb) {
       var lines = stdout.split("\n");
       var devices = [];
       lines.forEach(function(line) {
-        if (!(/Devices:/.test(line)) && (line !== ""))
-          devices.push(line);
+        // If first line, or empty line, remove,
+        if (!(/Devices:/.test(line)) && (line !== "")) {
+          var deviceProperties = {};
+          var splitLine = (line.replace(/^\t/, "")).split("\t");
+          devices.push( {
+            "name" : splitLine[0],
+            "MAC" : splitLine[1]
+          } );
+        }
       });
-      cb(devices);
+      cb(undefined, devices);
+    }
+    else {
+      cb(err, undefined);
     }
   });
 }
@@ -99,10 +109,10 @@ BluetoothScanner.prototype.getHciconfig = function(cb) {
           hciInfo[objIndex] = objValue;
         }
       });
-      cb(null, hciInfo);
+      cb(undefined, hciInfo);
     }
     else {
-      cb(err, null);
+      cb(err, undefined);
     }
   });
 }
@@ -126,10 +136,10 @@ BluetoothScanner.prototype.scan = function(cb) {
           devices.push(line);
         }
       });
-      cb(null, devices);
+      cb(undefined, devices);
     }
     else {
-      cb(err, null);
+      cb(err, undefined);
     }
   });
 }
