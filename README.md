@@ -18,7 +18,7 @@ Usage (for testing)
 
 ```
 -h, --help      -- this
--i, --interface The Bluetooth Network interface (default: hci0)
+-i, --interface -- The Bluetooth Network interface (default: hci0)
 --info          -- Shows the Bluetooth device configuration (in JSON).
 --scan          -- Scans for nearby devices and returns an array (*not yet parsed*)
 ```

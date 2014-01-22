@@ -2,10 +2,30 @@ var exec = require("child_process").exec,
     colors = require("colors");
 
 function BluetoothScanner(device, cb) {  
-  this.hcidev = device;
+  if (device)
+    this.hcidev = device;
+
   // Constructor callback defaults to sniffing.
   if (cb && typeof(cb) === "function")
     this.sniff(cb); 
+}
+
+BluetoothScanner.prototype.setDevice = function(device) {
+  this.device = device;
+}
+
+BluetoothScanner.prototype.getDevices = function(cb) {
+  exec("hcitool dev", function(err, stdout, stderr) {
+    if (!err) {
+      var lines = stdout.split("\n");
+      var devices = [];
+      lines.forEach(function(line) {
+        if (!(/Devices:/.test(line)) && (line !== ""))
+          devices.push(line);
+      });
+      cb(devices);
+    }
+  });
 }
 
 BluetoothScanner.prototype.getHciconfig = function(cb) {
