@@ -3,13 +3,12 @@ var exec = require("child_process").exec,
 
 function BluetoothScanner(device, cb) {  
   this.hcidev = device;
-  this.hciconfig = "hciconfig" + " -a " + device;
   if (cb && typeof(cb) === "function")
     cb(); 
 }
 
 BluetoothScanner.prototype.getHciconfig = function(cb) {
-  exec(this.hciconfig, function(err, stdout, stderr) {
+  exec("hciconfig -a " + this.device, function(err, stdout, stderr) {
     if (!err) {
       var hcidev = this.hcidev;
       var lines = stdout.split("\n");
@@ -95,7 +94,23 @@ BluetoothScanner.prototype.isUp = function(cb) {
 
 // hcitool scan
 BluetoothScanner.prototype.scan = function(cb) {
-
+  var command = "hcitool -i " + this.hcidev + " scan" 
+  exec(command,function (err, stdout, stdin) {
+    if (!err) {
+      var lines = stdout.split("\n"),
+          devices = [];
+      // Filter lines.
+      lines.forEach(function(line) {
+        if (!(/^Scanning/.test(line)) && (line !== "")) {
+          devices.push(line);
+        }
+      });
+      cb(devices);
+    }
+    else {
+      cb(err);
+    }
+  });
 }
 
 // hcidump

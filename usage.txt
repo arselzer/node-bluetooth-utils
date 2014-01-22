@@ -1,0 +1,6 @@
+
+  -h, --help        -- Show this.
+  -i, -- interface  -- The Bluetooth Network interface (default: hci0)
+  --info            -- Shows the Bluetooth device configuration (in JSON).
+  --scan            -- Scan for nerby devices.
+
