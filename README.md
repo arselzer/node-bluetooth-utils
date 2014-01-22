@@ -17,9 +17,10 @@ Usage (for testing)
 ========
 
 ```
---help, -h      -- this
---interface, -i -- The Bluetooth Network interface (default: hci0)
+-h, --help      -- this
+-i, --interface The Bluetooth Network interface (default: hci0)
 --info          -- Shows the Bluetooth device configuration (in JSON).
+--scan          -- Scans for nearby devices and returns an array (*not yet parsed*)
 ```
 
 Status
@@ -27,6 +28,8 @@ Status
 
 ~~Finish/improve hciconfig -> JS Obj parser.~~
 
-Implement the scanning.
+Fully implement scanning.
+
+Add packet sniffing functions
 
 Do even more (maybe).
