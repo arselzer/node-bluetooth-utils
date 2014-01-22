@@ -3,14 +3,15 @@ var exec = require("child_process").exec,
 
 function BluetoothScanner(device, cb) {  
   this.hcidev = device;
+  // Constructor callback defaults to sniffing.
   if (cb && typeof(cb) === "function")
-    cb(); 
+    this.sniff(cb); 
 }
 
 BluetoothScanner.prototype.getHciconfig = function(cb) {
-  exec("hciconfig -a " + this.device, function(err, stdout, stderr) {
+  var device = this.hcidev;
+  exec("hciconfig -a " + device, function(err, stdout, stderr) {
     if (!err) {
-      var hcidev = this.hcidev;
       var lines = stdout.split("\n");
       var hciInfo = {};
 
@@ -78,10 +79,10 @@ BluetoothScanner.prototype.getHciconfig = function(cb) {
           hciInfo[objIndex] = objValue;
         }
       });
-      cb(hciInfo);
+      cb(null, hciInfo);
     }
     else {
-      console.log("[Error]".red, err.message);
+      cb(err, null);
     }
   });
 }
@@ -94,7 +95,7 @@ BluetoothScanner.prototype.isUp = function(cb) {
 
 // hcitool scan
 BluetoothScanner.prototype.scan = function(cb) {
-  var command = "hcitool -i " + this.hcidev + " scan" 
+  var command = "hcitool -i " + this.hcidev + " scan";
   exec(command,function (err, stdout, stdin) {
     if (!err) {
       var lines = stdout.split("\n"),
@@ -105,10 +106,10 @@ BluetoothScanner.prototype.scan = function(cb) {
           devices.push(line);
         }
       });
-      cb(devices);
+      cb(null, devices);
     }
     else {
-      cb(err);
+      cb(err, null);
     }
   });
 }

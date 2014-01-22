@@ -11,23 +11,30 @@ function help() {
 }
 
 var hcidev = argv.interface || argv.i || "hci0";
-
-console.log("interface", hcidev);
+var scanner = new BluetoothScanner(hcidev);
 
 if (argv.help || argv.h) {
   help();
 }
 
 if (argv.info) {
-  var scanner = new BluetoothScanner(hcidev);
-  scanner.getHciconfig(function(config) {
-    console.log(JSON.stringify(config, null, 2));
+  scanner.getHciconfig(function(err, result) {
+    if (!err) {
+      console.log(JSON.stringify(result, null, 2) /* pretty format - 2 spaces */);
+    }
+    else {
+      console.error("[Error]".red, err.message);
+    }
   });
 }
 
 if (argv.scan) {
-  var scanner = new BluetoothScanner(hcidev);
-  scanner.scan(function(devices) {
-    console.log(JSON.stringify(devices));
+  scanner.scan(function(err, result) {
+    if (!err) {
+      console.log(JSON.stringify(result, null, 2));
+    }
+    else {
+      console.error("[Error]".red, err.message);
+    }
   });
 }
