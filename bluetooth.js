@@ -26,7 +26,7 @@ BluetoothScanner.prototype.getDevices = function(cb) {
           var splitLine = (line.replace(/^\t/, "")).split("\t");
           devices.push( {
             "name" : splitLine[0],
-            "MAC" : splitLine[1]
+            "address" : splitLine[1]
           } );
         }
       });
@@ -118,8 +118,11 @@ BluetoothScanner.prototype.getHciconfig = function(cb) {
 }
 
 BluetoothScanner.prototype.isUp = function(cb) {
-  this.getHciconfig(function(data) {
-    cb(data["State"] === "UP");
+  this.getHciconfig(function(err, data) {
+    if (!err)
+      cb(undefined, data["State"] === "UP");
+    else
+      cb(err, undefined);
   });
 }
 
