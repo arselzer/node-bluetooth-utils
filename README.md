@@ -1,17 +1,16 @@
-A Bluetooth logger/sniffer/configuration viewer
+A Bluetooth logger/sniffer/configuration tool
 ========
 
 *Warning:*
 This is not a high-performance Bluetooth library.
 It does not have direct C/C++ bindings to the Linux bluetooth stack.
 
-The main focus is to just parse Bluetooth device information in a
-JavaScript-friendly way.
+The main focus is simply parsing Bluetooth device information in a
+JavaScript-friendly way and logging packets.
 
-It is part of a little project, which will attempt to demonstrate security considerations
-to using Bluetooth.
+It is part of a little project, which will attempt to visualize data involving Bluetooth usage.
 
-A easy-to-use command line utility is included.
+A useful command line utility is included.
 
 
 ## Usage
@@ -45,11 +44,12 @@ blue.getDevices(function(err, devices) {
 });
 ```
 
-## Example
+## Examples
 
 ### Device Information Output
 
 ```
+$ node cli.js --info
 {
   "Type": "BR/EDR",
   "Bus": "USB",
@@ -123,4 +123,4 @@ Fully implement scanning.
 
 Add packet sniffing functions
 
-Do even more (maybe).
+Do even more.
