@@ -9,7 +9,7 @@
   "repository": {
     "type" : "git",
     "url" : "https://github.com/AlexanderSelzer/bluetooth-sniffer.git"
-  }
+  },
   
   "dependencies" : {
     "colors" : "0.6.x",

@@ -1,40 +1,155 @@
-var argv = require("optimist").argv,
-    fs = require("fs"),
-    BluetoothScanner = require("./bluetooth.js");
+var exec = require("child_process").exec,
+    colors = require("colors");
 
-function help() {
-  fs.createReadStream("usage.txt")
-  .on("end", function() {
-    process.exit();
-  })
-  .pipe(process.stdout);
+function BluetoothScanner(device, cb) {  
+  if (device)
+    this.hcidev = device;
+
+  // Constructor callback defaults to sniffing.
+  if (cb && typeof(cb) === "function")
+    this.sniff(cb); 
 }
 
-var hcidev = argv.interface || argv.i || "hci0";
-var scanner = new BluetoothScanner(hcidev);
-
-if (argv.help || argv.h) {
-  help();
+BluetoothScanner.prototype.setDevice = function(device) {
+  this.device = device;
 }
 
-if (argv.info) {
-  scanner.getHciconfig(function(err, result) {
+BluetoothScanner.prototype.getDevices = function(cb) {
+  exec("hcitool dev", function(err, stdout, stderr) {
     if (!err) {
-      console.log(JSON.stringify(result, null, 2) /* pretty format - 2 spaces */);
+      var lines = stdout.split("\n");
+      var devices = [];
+      lines.forEach(function(line) {
+        // If first line, or empty line, remove,
+        if (!(/Devices:/.test(line)) && (line !== "")) {
+          var deviceProperties = {};
+          var splitLine = (line.replace(/^\t/, "")).split("\t");
+          devices.push( {
+            "name" : splitLine[0],
+            "address" : splitLine[1]
+          } );
+        }
+      });
+      cb(undefined, devices);
     }
     else {
-      console.error("[Error]".red, err.message);
+      cb(err, undefined);
     }
   });
 }
 
-if (argv.scan) {
-  scanner.scan(function(err, result) {
+BluetoothScanner.prototype.getHciconfig = function(cb) {
+  var device = this.hcidev;
+  exec("hciconfig -a " + device, function(err, stdout, stderr) {
     if (!err) {
-      console.log(JSON.stringify(result, null, 2));
+      var lines = stdout.split("\n");
+      var hciInfo = {};
+
+      lines.forEach(function(line) {
+        // Filter out the "hci0" at the beginning.
+        if (/^hci/.test(line)) {
+          line = line.slice(line.indexOf(":") + 1, line.length);
+        }
+
+        var separatorIndex = line.indexOf(":");
+        var objIndex =  line.slice(0, separatorIndex)
+                        .replace(/\t/, ""); // Ugh, tabs.
+        var objValue =  line
+                        .slice(separatorIndex + 1, line.length)
+                        .replace(/\t/, "")
+                        .trim(); // Remove whitespace at both ends.
+    
+        // Split up the Type line into "Type" and "Bus".        
+        if (objIndex === "Type") {
+          var split = objValue.split(" ");
+          hciInfo[objIndex] = split[0];
+          hciInfo[split[2].slice(0, split[2].length - 1)] = split[3]
+        }
+        // Split Bluetooth Address
+        else if (objIndex === "BD Address") {
+          var split = objValue.split(" ");
+          hciInfo[objIndex] = split[0];
+          hciInfo[split[2] + " " + split[3]] = split[4];
+          hciInfo[split[6] + " " + split[7]] = split[8];
+        }
+        // Show State more conveniently
+        else if (/UP/.test(objIndex)) {
+          hciInfo["State"] = "UP";
+        }
+        else if (/DOWN/.test(objIndex)) {
+          hciInfo["State"] = "DOWN";
+        }
+        // Turn RX/TX info into subobjects.
+        else if (/(RX bytes)|(TX bytes)/.test(objIndex)) {
+          var rxInfo = {};
+          var split = objValue.split(" ");
+          rxInfo["bytes"] = split[0];
+          split.forEach(function(item) {
+            var rxSplit = item.split(":");
+            rxInfo[rxSplit[0]] = rxSplit[1];  
+          });
+          var indexName = /RX|TX/.exec(objIndex)[0];
+          hciInfo[indexName] = rxInfo;
+        }
+        // Turn array-like properties into arrays.
+        else if (/(Features)|(Packet type)|(Link policy)/.test(objIndex)) {
+          var objArray = objValue.split(" ");
+          hciInfo[objIndex] = objArray;
+        }
+        
+        else if (/(HCI Version)|(LMP Version)/.test(objIndex)) {
+          var info = {};
+          var split = objValue.split(" ");
+          info[objIndex.split(" ")[1]] = split[0] + " " + split[1];
+          info[split[3]] = split[4];
+          hciInfo[objIndex.split(" ")[0]] = info;
+        }
+        // If empty, drop (hciconfig prints empty lines).
+        else if (objIndex !== "") {
+          hciInfo[objIndex] = objValue;
+        }
+      });
+      cb(undefined, hciInfo);
     }
     else {
-      console.error("[Error]".red, err.message);
+      cb(err, undefined);
     }
   });
 }
+
+BluetoothScanner.prototype.isUp = function(cb) {
+  this.getHciconfig(function(err, data) {
+    if (!err)
+      cb(undefined, data["State"] === "UP");
+    else
+      cb(err, undefined);
+  });
+}
+
+// hcitool scan
+BluetoothScanner.prototype.scan = function(cb) {
+  var command = "hcitool -i " + this.hcidev + " scan";
+  exec(command,function (err, stdout, stdin) {
+    if (!err) {
+      var lines = stdout.split("\n"),
+          devices = [];
+      // Filter lines.
+      lines.forEach(function(line) {
+        if (!(/^Scanning/.test(line)) && (line !== "")) {
+          devices.push(line);
+        }
+      });
+      cb(undefined, devices);
+    }
+    else {
+      cb(err, undefined);
+    }
+  });
+}
+
+// hcidump
+BluetoothScanner.prototype.sniff = function(cb) {
+
+}
+
+module.exports = BluetoothScanner;
