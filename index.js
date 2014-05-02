@@ -11,7 +11,7 @@ function BluetoothScanner(device, cb) {
 }
 
 BluetoothScanner.prototype.setDevice = function(device) {
-  this.device = device;
+  this.hcidev= device;
 }
 
 BluetoothScanner.prototype.getDevices = function(cb) {
